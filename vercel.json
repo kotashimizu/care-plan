@@ -1,0 +1,18 @@
+{
+  "functions": {
+    "src/app/api/generate-plan/route.ts": {
+      "runtime": "edge"
+    },
+    "src/app/api/quality-check/route.ts": {
+      "runtime": "edge"
+    },
+    "src/app/api/generate-alternatives/route.ts": {
+      "runtime": "edge"
+    }
+  },
+  "env": {
+    "OPENAI_API_KEY": "@openai-api-key",
+    "ANTHROPIC_API_KEY": "@anthropic-api-key",
+    "NODE_ENV": "production"
+  }
+}
