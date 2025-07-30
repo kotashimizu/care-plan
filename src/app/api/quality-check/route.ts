@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     const prompt = generateQualityCheckPrompt(planText)
 
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 15000)
+    const timeoutId = setTimeout(() => controller.abort(), 20000)
     
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
           }
         ],
         temperature: 0.3,
-        max_tokens: 800,
+        max_tokens: 1200,
         response_format: { type: 'json_object' }
       }),
     })

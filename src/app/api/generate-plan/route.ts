@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     console.log('API: Request headers prepared')
     
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 25000)
+    const timeoutId = setTimeout(() => controller.abort(), 35000)
     
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
           }
         ],
         temperature: 0.7,
-        max_tokens: 1500,
+        max_tokens: 2200,
         response_format: { type: 'json_object' }
       }),
     })

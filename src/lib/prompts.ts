@@ -1,34 +1,137 @@
 import { FacilitySettings } from './types'
 
 export function generateSystemPrompt(facilitySettings?: FacilitySettings): string {
-  return `個別支援計画書を作成してください。以下のJSON形式で簡潔に出力：
+  const facilityTypeLabels = {
+    'employment-a': '就労継続支援A型',
+    'employment-b': '就労継続支援B型', 
+    'transition': '就労移行支援',
+    'daily-care': '生活介護',
+    'training-life': '自立訓練（生活訓練）',
+    'training-function': '自立訓練（機能訓練）'
+  }
+
+  let facilityInfo = ''
+  if (facilitySettings) {
+    facilityInfo = `
+## 事業所情報
+- 事業所種別: ${facilityTypeLabels[facilitySettings.facilityType] || '未設定'}
+- 主な作業種別: ${facilitySettings.workTypes.length > 0 ? facilitySettings.workTypes.join('、') : '未設定'}
+- 事業所の特徴: ${facilitySettings.facilityFeatures.length > 0 ? facilitySettings.facilityFeatures.join('、') : '未設定'}`
+  }
+
+  return `あなたは障害者総合支援法に精通したサービス管理責任者として、実用的な個別支援計画書を作成してください。
+${facilityInfo}
+
+## 作成指針
+- 障害者総合支援法第29条に基づく要件を満たす
+- 本人の意向と現実的な目標設定を行う
+- 具体的で測定可能な支援内容を記載する
+- ICFモデル（心身機能・活動・参加）の視点を含める
+- 事業所の特性を活かした実現可能な支援計画とする
+
+## 専門的要素
+- ストレングス視点で本人の強みを活用
+- SMART原則（具体的・測定可能・達成可能・関連性・期限明確）に基づく目標設定
+- 段階的なスキルアップを考慮した支援内容
+- 多職種連携と家族支援を含めた包括的アプローチ
+
+## 出力形式
+以下のJSON形式で、各項目を実用的な内容で記述してください：
 
 {
-  "userAndFamilyIntentions": "本人・家族の希望と不安",
-  "comprehensiveSupport": "支援方針",
-  "longTermGoal": "6ヶ月後の目標",
-  "shortTermGoal": "3ヶ月後の目標",
+  "userAndFamilyIntentions": "面談記録から本人・家族の具体的な意向、希望、不安を抽出し、それらの背景や理由も含めて詳細に記載してください。本人の表現や家族の心配事を具体的に引用することで、人間性が伝わる記述にしてください。",
+  
+  "comprehensiveSupport": "本人の障害特性、強み、環境要因を総合的に分析し、ICFモデルに基づいた支援方針を記載してください。事業所で提供可能な具体的支援内容と、他機関との連携が必要な領域を明確に分けて記述してください。",
+  
+  "longTermGoal": "6ヶ月後に到達すべき具体的で測定可能な目標を設定してください。本人の現在の能力と環境を考慮し、段階的に達成可能な現実的内容とし、明確な期限（令和○年○月○日まで）を設定してください。",
+  
+  "shortTermGoal": "長期目標達成のための3ヶ月後の中間目標を設定してください。観察・測定可能な具体的行動変容の内容とし、本人が達成感を得られる適切な難易度で、明確な期限を設定してください。",
+  
   "supportGoals": {
-    "employment": {"objective": "就労目標", "userRole": "本人の取組", "supportContent": "支援内容", "frequency": "頻度", "evaluation": "評価方法"},
-    "dailyLife": {"objective": "生活目標", "userRole": "本人の取組", "supportContent": "支援内容", "frequency": "頻度", "evaluation": "評価方法"},
-    "socialLife": {"objective": "社会参加目標", "userRole": "本人の取組", "supportContent": "支援内容", "frequency": "頻度", "evaluation": "評価方法"}
+    "employment": {
+      "objective": "事業所の特性を活かした就労能力向上の具体的目標と、客観的に測定できる数値指標を設定してください。",
+      "userRole": "本人が主体的に取り組む具体的行動内容と、実践頻度・時間・方法等を明確に設定してください（週○回、1日○時間等）。",
+      "supportContent": "障害特性に応じた指導方法、使用する支援技法、必要なツールや環境調整、多職種チームによる連携内容を具体的に記載してください。",
+      "frequency": "事業所の運営実態と法的要件に適合した現実的な支援頻度を設定してください。",
+      "evaluation": "客観的で信頼性のある測定指標、定期的評価の実施時期と担当者、具体的評価方法と達成度判定基準を明確に設定してください。"
+    },
+    "dailyLife": {
+      "objective": "ADL・IADLの向上を目指す具体的目標と、優先的に取り組むべき生活技能項目を特定してください。",
+      "userRole": "日常生活場面での本人の具体的実践内容と、自己管理能力向上のための取り組みを設定してください。",
+      "supportContent": "個別アセスメントに基づく生活技能訓練の内容、環境調整、家族・関係機関との連携方法を記載してください。",
+      "frequency": "日常生活支援の具体的実施頻度・タイミングと、事業所利用日における支援提供回数を設定してください。",
+      "evaluation": "生活スキル向上度の客観的評価指標と、自立度の段階的評価方法、評価実施スケジュールを設定してください。"
+    },
+    "socialLife": {
+      "objective": "対人関係・コミュニケーション・社会参加における具体的改善目標を設定してください。",
+      "userRole": "社会参加場面での本人の具体的チャレンジ内容と、対人関係において実践する取り組みを設定してください。",
+      "supportContent": "ソーシャルスキルトレーニングの具体的手法、段階的社会参加プログラム、地域資源との連携方法を記載してください。",
+      "frequency": "社会生活支援の具体的実施頻度・継続期間と、グループワークや外出支援等の実施回数を設定してください。",
+      "evaluation": "対人関係スキルの行動観察評価指標、社会参加の質的変化の測定方法、満足度・QOL向上度の評価を設定してください。"
+    }
   },
-  "qualityScore": {"expertise": 80, "specificity": 75, "feasibility": 85, "consistency": 80, "overall": 80}
+  "qualityScore": {
+    "expertise": 85,
+    "specificity": 80,
+    "feasibility": 90,
+    "consistency": 85,
+    "overall": 85
+  }
 }`
 }
 
 export function generateUserPrompt(interviewRecord: string): string {
-  return `面談記録: ${interviewRecord}`
+  return `以下の面談記録を基に、障害者総合支援法第29条に基づく実用的な個別支援計画書を作成してください。
+
+## 面談記録
+${interviewRecord}
+
+## 作成要求
+- 面談記録から本人の具体的な発言や様子を引用し、人間性が伝わる記述にしてください
+- 本人の強みと課題を明確に分析し、ストレングス視点で支援計画を立ててください  
+- 実現可能で測定可能な目標を設定し、具体的な支援方法を記載してください
+- 専門用語を適切に使用し、法的要件を満たしつつ実用的な内容にしてください
+- 各支援領域（就労・日常生活・社会生活）で本人の成長段階に応じた計画を作成してください`
 }
 
 export function generateQualityCheckPrompt(plan: string): string {
-  return `以下の計画書を評価してください：
+  return `以下の個別支援計画書を専門的な観点から評価し、改善提案を行ってください。
+
+## 評価対象計画書
 ${plan}
+
+## 評価基準
+1. **専門性（0-100）**: 障害福祉の専門知識・法的要件の適合度
+2. **具体性（0-100）**: 目標・支援内容の具体性と実行可能性
+3. **実現可能性（0-100）**: 利用者の状況と事業所資源での実現度
+4. **一貫性（0-100）**: 計画全体の論理的整合性と一貫性
+5. **総合評価（0-100）**: 上記を総合した実用性評価
+
+## 評価視点
+- 障害者総合支援法第29条の要件充足度
+- ICFモデルに基づく包括的支援の観点
+- SMART原則による目標設定の妥当性
+- ストレングス視点での本人の強み活用度
+- 多職種連携と家族支援の具体性
 
 JSON形式で出力：
 {
-  "score": {"expertise": 数値, "specificity": 数値, "feasibility": 数値, "consistency": 数値, "overall": 数値},
-  "improvements": ["改善提案1", "改善提案2"],
-  "suggestions": ["検討事項1", "検討事項2"]
+  "score": {
+    "expertise": 数値,
+    "specificity": 数値, 
+    "feasibility": 数値,
+    "consistency": 数値,
+    "overall": 数値
+  },
+  "improvements": [
+    "具体的な改善提案（専門性向上の観点から）",
+    "実現可能性を高める改善案",
+    "より具体的な支援内容への修正提案"
+  ],
+  "suggestions": [
+    "追加で検討すべき支援項目",
+    "他機関連携の可能性",
+    "長期的な成長を見据えた提案"
+  ]
 }`
 }
