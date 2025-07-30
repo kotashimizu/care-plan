@@ -11,9 +11,13 @@ export interface FacilitySettings {
 }
 
 export interface SupportGoal {
+  itemName: string;
   objective: string;
   supportContent: string;
+  achievementPeriod: string;
+  provider: string;
   userRole: string;
+  priority: string;
 }
 
 export interface IndividualSupportPlan {

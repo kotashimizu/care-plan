@@ -129,6 +129,14 @@ export default function EditableSupportPlan({ plan, onSave, onCancel }: Editable
       <CardContent>
         <div className="space-y-4">
           <div>
+            <h4 className="font-medium text-sm text-muted-foreground mb-2">項目</h4>
+            <EditableField 
+              value={goal.itemName}
+              onChange={(value) => onChange('itemName', value)}
+              placeholder="支援項目名を入力してください..."
+            />
+          </div>
+          <div>
             <h4 className="font-medium text-sm text-muted-foreground mb-2">支援目標</h4>
             <EditableField 
               value={goal.objective}
@@ -144,12 +152,38 @@ export default function EditableSupportPlan({ plan, onSave, onCancel }: Editable
               placeholder="支援内容・提供上のポイントを入力してください..."
             />
           </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <h4 className="font-medium text-sm text-muted-foreground mb-2">達成時期</h4>
+              <EditableField 
+                value={goal.achievementPeriod}
+                onChange={(value) => onChange('achievementPeriod', value)}
+                placeholder="目標達成の具体的時期を入力してください..."
+              />
+            </div>
+            <div>
+              <h4 className="font-medium text-sm text-muted-foreground mb-2">担当者</h4>
+              <EditableField 
+                value={goal.provider}
+                onChange={(value) => onChange('provider', value)}
+                placeholder="担当者・提供機関名を入力してください..."
+              />
+            </div>
+          </div>
           <div>
             <h4 className="font-medium text-sm text-muted-foreground mb-2">留意事項（本人の役割を含む）</h4>
             <EditableField 
               value={goal.userRole}
               onChange={(value) => onChange('userRole', value)}
               placeholder="本人の役割や留意事項を入力してください..."
+            />
+          </div>
+          <div>
+            <h4 className="font-medium text-sm text-muted-foreground mb-2">優先順位</h4>
+            <EditableField 
+              value={goal.priority}
+              onChange={(value) => onChange('priority', value)}
+              placeholder="優先順位（高・中・低）と理由を入力してください..."
             />
           </div>
         </div>

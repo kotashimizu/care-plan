@@ -2,10 +2,12 @@
 
 import { useState } from 'react'
 import { HomePageState, FacilitySettings, QualityCheckResult } from '@/lib/types'
+import { validateInterviewRecord, ValidationResult } from '@/lib/validation'
 import FacilitySettingsPanel from '@/components/FacilitySettingsPanel'
 import InterviewRecordInput from '@/components/InterviewRecordInput'
 import SupportPlanDisplay from '@/components/SupportPlanDisplay'
 import QualityCheck from '@/components/QualityCheck'
+import ValidationWarnings from '@/components/ValidationWarnings'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { AlertCircle, Info } from 'lucide-react'
 
@@ -32,6 +34,7 @@ export default function HomePage() {
 
   const [qualityResult, setQualityResult] = useState<QualityCheckResult | null>(null)
   const [isQualityChecking, setIsQualityChecking] = useState(false)
+  const [validationResult, setValidationResult] = useState<ValidationResult | null>(null)
 
   const handleFacilitySettingsChange = (settings: FacilitySettings) => {
     setState(prev => ({
@@ -45,6 +48,14 @@ export default function HomePage() {
       ...prev,
       interviewRecord: value
     }))
+    
+    // リアルタイムバリデーション
+    if (value.trim().length > 0) {
+      const validation = validateInterviewRecord(value)
+      setValidationResult(validation)
+    } else {
+      setValidationResult(null)
+    }
   }
 
   const generatePlan = async () => {
@@ -179,6 +190,11 @@ export default function HomePage() {
         onGenerate={generatePlan}
         isGenerating={state.isGenerating}
       />
+
+      {/* バリデーション警告 */}
+      {validationResult && (
+        <ValidationWarnings validationResult={validationResult} />
+      )}
 
       {/* 生成された計画書 */}
       {state.generatedPlan && (
