@@ -66,9 +66,13 @@ export async function POST(request: NextRequest) {
     
     console.log('API: Request headers prepared')
     
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 50000)
+    
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers,
+      signal: controller.signal,
       body: JSON.stringify({
         model: 'gpt-4o',
         messages: [
@@ -82,10 +86,12 @@ export async function POST(request: NextRequest) {
           }
         ],
         temperature: 0.7,
-        max_tokens: 2000,
+        max_tokens: 4000,
         response_format: { type: 'json_object' }
       }),
     })
+    
+    clearTimeout(timeoutId)
     
     console.log('API: OpenAI response status:', response.status)
 
@@ -118,7 +124,20 @@ export async function POST(request: NextRequest) {
       console.log('API: Parsing AI response...')
       console.log('API: AI response content (first 500 chars):', content.substring(0, 500))
       
-      const plan = JSON.parse(content)
+      // JSONの前後の不要なテキストを除去
+      let cleanContent = content.trim()
+      
+      // JSONの開始位置を探す
+      const jsonStartIndex = cleanContent.indexOf('{')
+      const jsonEndIndex = cleanContent.lastIndexOf('}')
+      
+      if (jsonStartIndex !== -1 && jsonEndIndex !== -1) {
+        cleanContent = cleanContent.substring(jsonStartIndex, jsonEndIndex + 1)
+      }
+      
+      console.log('API: Cleaned content (first 200 chars):', cleanContent.substring(0, 200))
+      
+      const plan = JSON.parse(cleanContent)
       console.log('API: Successfully parsed JSON')
       
       const result: GeneratePlanResponse = {
@@ -129,12 +148,13 @@ export async function POST(request: NextRequest) {
     } catch (parseError) {
       console.error('JSON Parse Error - Full details:', {
         message: parseError instanceof Error ? parseError.message : 'Unknown parse error',
-        content: content,
-        contentLength: content.length
+        originalContent: content,
+        contentLength: content.length,
+        error: parseError
       })
       return NextResponse.json(
         { 
-          error: 'AIの応答形式が正しくありません',
+          error: 'AIの応答形式が正しくありません。しばらく待ってから再試行してください。',
           details: parseError instanceof Error ? parseError.message : 'Parse error'
         },
         { status: 500 }
@@ -148,9 +168,20 @@ export async function POST(request: NextRequest) {
       error: error
     })
     
+    // タイムアウトエラーの特別処理
+    if (error instanceof Error && error.name === 'AbortError') {
+      return NextResponse.json(
+        { 
+          error: 'リクエストがタイムアウトしました。しばらく待ってから再試行してください。',
+          details: 'Timeout error'
+        },
+        { status: 504 }
+      )
+    }
+    
     return NextResponse.json(
       { 
-        error: '内部サーバーエラーが発生しました',
+        error: '内部サーバーエラーが発生しました。しばらく待ってから再試行してください。',
         details: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }

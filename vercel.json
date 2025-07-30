@@ -1,1 +1,10 @@
-{}
+{
+  "functions": {
+    "src/app/api/generate-plan/route.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/quality-check/route.ts": {
+      "maxDuration": 30
+    }
+  }
+}

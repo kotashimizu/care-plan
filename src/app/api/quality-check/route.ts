@@ -53,12 +53,16 @@ export async function POST(request: NextRequest) {
 
     const prompt = generateQualityCheckPrompt(planText)
 
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 25000)
+    
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
+      signal: controller.signal,
       body: JSON.stringify({
         model: 'gpt-4o',
         messages: [
@@ -68,10 +72,12 @@ export async function POST(request: NextRequest) {
           }
         ],
         temperature: 0.3,
-        max_tokens: 1500,
+        max_tokens: 2000,
         response_format: { type: 'json_object' }
       }),
     })
+    
+    clearTimeout(timeoutId)
 
     if (!response.ok) {
       const errorText = await response.text()
@@ -93,20 +99,40 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      const qualityResult: QualityCheckResult = JSON.parse(content)
+      // JSONの前後の不要なテキストを除去
+      let cleanContent = content.trim()
+      
+      // JSONの開始位置を探す
+      const jsonStartIndex = cleanContent.indexOf('{')
+      const jsonEndIndex = cleanContent.lastIndexOf('}')
+      
+      if (jsonStartIndex !== -1 && jsonEndIndex !== -1) {
+        cleanContent = cleanContent.substring(jsonStartIndex, jsonEndIndex + 1)
+      }
+      
+      const qualityResult: QualityCheckResult = JSON.parse(cleanContent)
       return NextResponse.json(qualityResult)
     } catch (parseError) {
-      console.error('JSON Parse Error:', parseError)
+      console.error('JSON Parse Error:', parseError, 'Content:', content)
       return NextResponse.json(
-        { error: 'AIの応答形式が正しくありません' },
+        { error: 'AIの応答形式が正しくありません。しばらく待ってから再試行してください。' },
         { status: 500 }
       )
     }
 
   } catch (error) {
     console.error('API Error:', error)
+    
+    // タイムアウトエラーの特別処理
+    if (error instanceof Error && error.name === 'AbortError') {
+      return NextResponse.json(
+        { error: 'リクエストがタイムアウトしました。しばらく待ってから再試行してください。' },
+        { status: 504 }
+      )
+    }
+    
     return NextResponse.json(
-      { error: '内部サーバーエラーが発生しました' },
+      { error: '内部サーバーエラーが発生しました。しばらく待ってから再試行してください。' },
       { status: 500 }
     )
   }
