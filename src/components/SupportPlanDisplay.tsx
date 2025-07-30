@@ -4,16 +4,45 @@ import { useState } from 'react'
 import { IndividualSupportPlan } from '@/lib/types'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Copy, CheckCircle, FileText, Target, Calendar, User, Heart } from 'lucide-react'
+import { Copy, CheckCircle, FileText, Target, Calendar, User, Heart, Edit2 } from 'lucide-react'
+import EditableSupportPlan from './EditableSupportPlan'
 
 interface SupportPlanDisplayProps {
   plan: IndividualSupportPlan | null
+  onPlanUpdate?: (updatedPlan: IndividualSupportPlan) => void
 }
 
-export default function SupportPlanDisplay({ plan }: SupportPlanDisplayProps) {
+export default function SupportPlanDisplay({ plan, onPlanUpdate }: SupportPlanDisplayProps) {
   const [copiedSection, setCopiedSection] = useState<string | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [displayPlan, setDisplayPlan] = useState(plan)
 
   if (!plan) return null
+
+  const currentPlan = displayPlan || plan
+
+  const handleEditSave = (updatedPlan: IndividualSupportPlan) => {
+    setDisplayPlan(updatedPlan)
+    setIsEditing(false)
+    if (onPlanUpdate) {
+      onPlanUpdate(updatedPlan)
+    }
+  }
+
+  const handleEditCancel = () => {
+    setIsEditing(false)
+  }
+
+  // 編集モードの場合は EditableSupportPlan を表示
+  if (isEditing) {
+    return (
+      <EditableSupportPlan
+        plan={currentPlan}
+        onSave={handleEditSave}
+        onCancel={handleEditCancel}
+      />
+    )
+  }
 
   const copyToClipboard = async (text: string, section: string) => {
     try {
@@ -30,39 +59,39 @@ export default function SupportPlanDisplay({ plan }: SupportPlanDisplayProps) {
 【個別支援計画書】
 
 ■ ご本人・ご家族の意向
-${plan.userAndFamilyIntentions}
+${currentPlan.userAndFamilyIntentions}
 
 ■ 総合的な支援の方針
-${plan.comprehensiveSupport}
+${currentPlan.comprehensiveSupport}
 
 ■ 長期目標
-${plan.longTermGoal}
+${currentPlan.longTermGoal}
 
 ■ 短期目標
-${plan.shortTermGoal}
+${currentPlan.shortTermGoal}
 
 ■ 支援目標
 
 【就労に関する支援】
-目標: ${plan.supportGoals.employment.objective}
-ご本人の役割: ${plan.supportGoals.employment.userRole}
-支援内容: ${plan.supportGoals.employment.supportContent}
-頻度: ${plan.supportGoals.employment.frequency}
-評価方法: ${plan.supportGoals.employment.evaluation}
+目標: ${currentPlan.supportGoals.employment.objective}
+ご本人の役割: ${currentPlan.supportGoals.employment.userRole}
+支援内容: ${currentPlan.supportGoals.employment.supportContent}
+頻度: ${currentPlan.supportGoals.employment.frequency}
+評価方法: ${currentPlan.supportGoals.employment.evaluation}
 
 【日常生活に関する支援】
-目標: ${plan.supportGoals.dailyLife.objective}
-ご本人の役割: ${plan.supportGoals.dailyLife.userRole}
-支援内容: ${plan.supportGoals.dailyLife.supportContent}
-頻度: ${plan.supportGoals.dailyLife.frequency}
-評価方法: ${plan.supportGoals.dailyLife.evaluation}
+目標: ${currentPlan.supportGoals.dailyLife.objective}
+ご本人の役割: ${currentPlan.supportGoals.dailyLife.userRole}
+支援内容: ${currentPlan.supportGoals.dailyLife.supportContent}
+頻度: ${currentPlan.supportGoals.dailyLife.frequency}
+評価方法: ${currentPlan.supportGoals.dailyLife.evaluation}
 
 【社会生活に関する支援】
-目標: ${plan.supportGoals.socialLife.objective}
-ご本人の役割: ${plan.supportGoals.socialLife.userRole}
-支援内容: ${plan.supportGoals.socialLife.supportContent}
-頻度: ${plan.supportGoals.socialLife.frequency}
-評価方法: ${plan.supportGoals.socialLife.evaluation}
+目標: ${currentPlan.supportGoals.socialLife.objective}
+ご本人の役割: ${currentPlan.supportGoals.socialLife.userRole}
+支援内容: ${currentPlan.supportGoals.socialLife.supportContent}
+頻度: ${currentPlan.supportGoals.socialLife.frequency}
+評価方法: ${currentPlan.supportGoals.socialLife.evaluation}
     `.trim()
     
     await copyToClipboard(fullText, 'full')
@@ -188,32 +217,42 @@ ${plan.shortTermGoal}
           <FileText className="h-6 w-6" />
           生成された個別支援計画書
         </h2>
-        <Button onClick={copyFullPlan} variant="outline">
-          {copiedSection === 'full' ? (
-            <>
-              <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
-              コピー完了
-            </>
-          ) : (
-            <>
-              <Copy className="mr-2 h-4 w-4" />
-              全体をコピー
-            </>
-          )}
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={() => setIsEditing(true)} 
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Edit2 className="h-4 w-4" />
+            編集
+          </Button>
+          <Button onClick={copyFullPlan} variant="outline">
+            {copiedSection === 'full' ? (
+              <>
+                <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
+                コピー完了
+              </>
+            ) : (
+              <>
+                <Copy className="mr-2 h-4 w-4" />
+                全体をコピー
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-4">
         <SectionCard
           title="ご本人・ご家族の意向"
-          content={plan.userAndFamilyIntentions}
+          content={currentPlan.userAndFamilyIntentions}
           icon={Heart}
           sectionKey="intentions"
         />
 
         <SectionCard
           title="総合的な支援の方針"
-          content={plan.comprehensiveSupport}
+          content={currentPlan.comprehensiveSupport}
           icon={Target}
           sectionKey="comprehensive"
         />
@@ -221,14 +260,14 @@ ${plan.shortTermGoal}
         <div className="grid md:grid-cols-2 gap-4">
           <SectionCard
             title="長期目標"
-            content={plan.longTermGoal}
+            content={currentPlan.longTermGoal}
             icon={Target}
             sectionKey="longTerm"
           />
 
           <SectionCard
             title="短期目標"
-            content={plan.shortTermGoal}
+            content={currentPlan.shortTermGoal}
             icon={Calendar}
             sectionKey="shortTerm"
           />
@@ -239,21 +278,21 @@ ${plan.shortTermGoal}
           
           <SupportGoalCard
             title="就労に関する支援"
-            goal={plan.supportGoals.employment}
+            goal={currentPlan.supportGoals.employment}
             icon={Target}
             sectionKey="employment"
           />
 
           <SupportGoalCard
             title="日常生活に関する支援"
-            goal={plan.supportGoals.dailyLife}
+            goal={currentPlan.supportGoals.dailyLife}
             icon={User}
             sectionKey="dailyLife"
           />
 
           <SupportGoalCard
             title="社会生活に関する支援"
-            goal={plan.supportGoals.socialLife}
+            goal={currentPlan.supportGoals.socialLife}
             icon={Heart}
             sectionKey="socialLife"
           />

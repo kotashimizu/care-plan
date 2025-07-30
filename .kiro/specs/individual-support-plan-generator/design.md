@@ -16,12 +16,12 @@
 
 ### 技術スタック
 
-- **フロントエンド**: Next.js 14 (App Router), React 18, TypeScript
-- **スタイリング**: Tailwind CSS, shadcn/ui コンポーネント
+- **フロントエンド**: Next.js 15.4.3 (App Router), React 19, TypeScript 5.8.3
+- **スタイリング**: Tailwind CSS 3.4.16, shadcn/ui コンポーネント
 - **状態管理**: React useState/useReducer (クライアントサイド)
-- **API**: Next.js API Routes (Edge Functions)
+- **API**: Next.js API Routes (Node.js Runtime - Edge Runtimeから変更)
 - **デプロイ**: Vercel
-- **AI API**: OpenAI GPT-4 または Anthropic Claude
+- **AI API**: OpenAI GPT-4 (max_tokens: 2200, timeout: 35s)
 
 ### セキュリティ設計
 
@@ -143,6 +143,35 @@ interface AlternativePlan {
 // 3つの代替案生成と表示機能
 ```
 
+### 8. テキスト編集機能 (`components/EditableSupportPlan.tsx`) - 計画中
+
+```typescript
+interface EditableSupportPlanProps {
+  plan: IndividualSupportPlan;
+  onSave: (updatedPlan: IndividualSupportPlan) => void;
+  onCancel: () => void;
+}
+
+// React ContentEditableを使用した計画書編集機能
+// - インライン編集モード
+// - 保存/キャンセル機能
+// - 編集状態管理
+```
+
+### 9. PDF出力機能 (`components/PDFExport.tsx`) - 計画中
+
+```typescript
+interface PDFExportProps {
+  plan: IndividualSupportPlan;
+  facilityInfo?: FacilitySettings;
+}
+
+// @react-pdf/rendererを使用したPDF生成機能
+// - A4サイズでの出力
+// - 事業所情報、作成日時、ページ番号
+// - 印刷に適したレイアウト
+```
+
 ## データモデル
 
 ### API リクエスト形式
@@ -183,9 +212,10 @@ interface PromptTemplate {
 // リクエスト: GeneratePlanRequest
 // レスポンス: GeneratePlanResponse
 
-// Edge Function として実装
+// Node.js Runtime として実装（504エラー対策）
 // AI APIへのプロキシ機能
 // エラーハンドリングとレート制限対応
+// タイムアウト: 35秒、max_tokens: 2200
 ```
 
 ### 2. 品質チェックAPI (`/api/quality-check`)
@@ -211,6 +241,7 @@ interface PromptTemplate {
    - 接続エラー: 再試行ボタン表示
    - 認証エラー: システム管理者への連絡案内
    - レート制限: 待機時間表示
+   - **✅ 実装済み** 504タイムアウトエラー: Node.js Runtime + 最適化されたプロンプト + Vercel関数タイムアウト設定で解決
 
 2. **入力エラー**
    - 空の面談記録: 入力促進メッセージ
@@ -219,6 +250,7 @@ interface PromptTemplate {
 3. **システムエラー**
    - 予期しないエラー: 一般的なエラーメッセージ
    - ネットワークエラー: オフライン対応案内
+   - **✅ 実装済み** JSON解析エラー: コンテンツクリーニング機能で対応
 
 ## テスト戦略
 
@@ -276,26 +308,24 @@ interface PromptTemplate {
 ### Vercel設定
 
 ```javascript
-// vercel.json
+// vercel.json - 504エラー対策として更新
 {
   "functions": {
-    "app/api/generate-plan/route.ts": {
-      "runtime": "edge"
-    }
-  },
-  "env": {
-    "OPENAI_API_KEY": "@openai-api-key",
-    "ANTHROPIC_API_KEY": "@anthropic-api-key"
+    "src/app/api/generate-plan/route.ts": { "maxDuration": 60 },
+    "src/app/api/quality-check/route.ts": { "maxDuration": 30 }
   }
 }
 ```
 
+**重要**: Edge Runtimeは30秒制限のためNode.js Runtimeに変更済み
+
 ### 環境変数
 
-- `OPENAI_API_KEY`: OpenAI API キー
-- `ANTHROPIC_API_KEY`: Anthropic API キー（代替）
+- `OPENAI_API_KEY`: OpenAI API キー（現在使用中）
 - `NODE_ENV`: 環境設定
 - `NEXT_PUBLIC_APP_URL`: アプリケーションURL
+
+**注意**: Anthropic API使用は不採用に決定
 
 ## 運用・監視
 

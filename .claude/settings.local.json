@@ -6,7 +6,11 @@
       "Bash(npm install:*)",
       "Bash(npm run build:*)",
       "Bash(npm uninstall:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(claude mcp:*)",
+      "Bash(vercel:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(git add:*)"
     ],
     "deny": []
   }
