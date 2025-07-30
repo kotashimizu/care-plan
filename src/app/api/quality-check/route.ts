@@ -30,25 +30,19 @@ export async function POST(request: NextRequest) {
 短期目標: ${plan.shortTermGoal}
 
 就労支援目標:
-- 目標: ${plan.supportGoals.employment.objective}
-- ご本人の役割: ${plan.supportGoals.employment.userRole}
+- 支援目標: ${plan.supportGoals.employment.objective}
 - 支援内容: ${plan.supportGoals.employment.supportContent}
-- 頻度: ${plan.supportGoals.employment.frequency}
-- 評価: ${plan.supportGoals.employment.evaluation}
+- 留意事項: ${plan.supportGoals.employment.userRole}
 
 日常生活支援目標:
-- 目標: ${plan.supportGoals.dailyLife.objective}
-- ご本人の役割: ${plan.supportGoals.dailyLife.userRole}
+- 支援目標: ${plan.supportGoals.dailyLife.objective}
 - 支援内容: ${plan.supportGoals.dailyLife.supportContent}
-- 頻度: ${plan.supportGoals.dailyLife.frequency}
-- 評価: ${plan.supportGoals.dailyLife.evaluation}
+- 留意事項: ${plan.supportGoals.dailyLife.userRole}
 
 社会生活支援目標:
-- 目標: ${plan.supportGoals.socialLife.objective}
-- ご本人の役割: ${plan.supportGoals.socialLife.userRole}
+- 支援目標: ${plan.supportGoals.socialLife.objective}
 - 支援内容: ${plan.supportGoals.socialLife.supportContent}
-- 頻度: ${plan.supportGoals.socialLife.frequency}
-- 評価: ${plan.supportGoals.socialLife.evaluation}
+- 留意事項: ${plan.supportGoals.socialLife.userRole}
     `.trim()
 
     const prompt = generateQualityCheckPrompt(planText)

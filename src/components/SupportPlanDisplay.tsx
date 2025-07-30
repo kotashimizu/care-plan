@@ -73,25 +73,19 @@ ${currentPlan.shortTermGoal}
 ■ 支援目標
 
 【就労に関する支援】
-目標: ${currentPlan.supportGoals.employment.objective}
-ご本人の役割: ${currentPlan.supportGoals.employment.userRole}
+支援目標: ${currentPlan.supportGoals.employment.objective}
 支援内容: ${currentPlan.supportGoals.employment.supportContent}
-頻度: ${currentPlan.supportGoals.employment.frequency}
-評価方法: ${currentPlan.supportGoals.employment.evaluation}
+留意事項: ${currentPlan.supportGoals.employment.userRole}
 
 【日常生活に関する支援】
-目標: ${currentPlan.supportGoals.dailyLife.objective}
-ご本人の役割: ${currentPlan.supportGoals.dailyLife.userRole}
+支援目標: ${currentPlan.supportGoals.dailyLife.objective}
 支援内容: ${currentPlan.supportGoals.dailyLife.supportContent}
-頻度: ${currentPlan.supportGoals.dailyLife.frequency}
-評価方法: ${currentPlan.supportGoals.dailyLife.evaluation}
+留意事項: ${currentPlan.supportGoals.dailyLife.userRole}
 
 【社会生活に関する支援】
-目標: ${currentPlan.supportGoals.socialLife.objective}
-ご本人の役割: ${currentPlan.supportGoals.socialLife.userRole}
+支援目標: ${currentPlan.supportGoals.socialLife.objective}
 支援内容: ${currentPlan.supportGoals.socialLife.supportContent}
-頻度: ${currentPlan.supportGoals.socialLife.frequency}
-評価方法: ${currentPlan.supportGoals.socialLife.evaluation}
+留意事項: ${currentPlan.supportGoals.socialLife.userRole}
     `.trim()
     
     await copyToClipboard(fullText, 'full')
@@ -146,10 +140,8 @@ ${currentPlan.shortTermGoal}
     title: string
     goal: {
       objective: string
-      userRole: string
       supportContent: string
-      frequency: string
-      evaluation: string
+      userRole: string
     }
     icon: React.ComponentType<{ className?: string }>
     sectionKey: string 
@@ -165,11 +157,9 @@ ${currentPlan.shortTermGoal}
             variant="ghost"
             size="sm"
             onClick={() => copyToClipboard(`
-目標: ${goal.objective}
-ご本人の役割: ${goal.userRole}
+支援目標: ${goal.objective}
 支援内容: ${goal.supportContent}
-頻度: ${goal.frequency}
-評価方法: ${goal.evaluation}
+留意事項: ${goal.userRole}
             `.trim(), sectionKey)}
             className="h-8 w-8 p-0"
           >
@@ -184,26 +174,16 @@ ${currentPlan.shortTermGoal}
       <CardContent>
         <div className="space-y-3">
           <div>
-            <h4 className="font-medium text-sm text-muted-foreground mb-1">目標</h4>
+            <h4 className="font-medium text-sm text-muted-foreground mb-1">支援目標</h4>
             <p className="text-sm">{goal.objective}</p>
-          </div>
-          <div>
-            <h4 className="font-medium text-sm text-muted-foreground mb-1">ご本人の役割</h4>
-            <p className="text-sm">{goal.userRole}</p>
           </div>
           <div>
             <h4 className="font-medium text-sm text-muted-foreground mb-1">支援内容</h4>
             <p className="text-sm">{goal.supportContent}</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-1">頻度</h4>
-              <p className="text-sm">{goal.frequency}</p>
-            </div>
-            <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-1">評価方法</h4>
-              <p className="text-sm">{goal.evaluation}</p>
-            </div>
+          <div>
+            <h4 className="font-medium text-sm text-muted-foreground mb-1">留意事項（本人の役割を含む）</h4>
+            <p className="text-sm">{goal.userRole}</p>
           </div>
         </div>
       </CardContent>

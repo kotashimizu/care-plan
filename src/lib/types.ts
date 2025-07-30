@@ -12,10 +12,8 @@ export interface FacilitySettings {
 
 export interface SupportGoal {
   objective: string;
-  userRole: string;
   supportContent: string;
-  frequency: string;
-  evaluation: string;
+  userRole: string;
 }
 
 export interface IndividualSupportPlan {

@@ -5,7 +5,7 @@ import ContentEditable from 'react-contenteditable'
 import { IndividualSupportPlan, SupportGoal } from '@/lib/types'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Save, X, Edit2, FileText, Target, Calendar, User, Heart } from 'lucide-react'
+import { Save, X, Edit2, Target, Calendar, User, Heart } from 'lucide-react'
 
 interface EditableSupportPlanProps {
   plan: IndividualSupportPlan
@@ -129,7 +129,7 @@ export default function EditableSupportPlan({ plan, onSave, onCancel }: Editable
       <CardContent>
         <div className="space-y-4">
           <div>
-            <h4 className="font-medium text-sm text-muted-foreground mb-2">目標</h4>
+            <h4 className="font-medium text-sm text-muted-foreground mb-2">支援目標</h4>
             <EditableField 
               value={goal.objective}
               onChange={(value) => onChange('objective', value)}
@@ -137,38 +137,20 @@ export default function EditableSupportPlan({ plan, onSave, onCancel }: Editable
             />
           </div>
           <div>
-            <h4 className="font-medium text-sm text-muted-foreground mb-2">ご本人の役割</h4>
-            <EditableField 
-              value={goal.userRole}
-              onChange={(value) => onChange('userRole', value)}
-              placeholder="ご本人が取り組む内容を入力してください..."
-            />
-          </div>
-          <div>
             <h4 className="font-medium text-sm text-muted-foreground mb-2">支援内容</h4>
             <EditableField 
               value={goal.supportContent}
               onChange={(value) => onChange('supportContent', value)}
-              placeholder="職員が提供する支援内容を入力してください..."
+              placeholder="支援内容・提供上のポイントを入力してください..."
             />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-2">頻度</h4>
-              <EditableField 
-                value={goal.frequency}
-                onChange={(value) => onChange('frequency', value)}
-                placeholder="実施頻度を入力してください..."
-              />
-            </div>
-            <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-2">評価方法</h4>
-              <EditableField 
-                value={goal.evaluation}
-                onChange={(value) => onChange('evaluation', value)}
-                placeholder="評価方法を入力してください..."
-              />
-            </div>
+          <div>
+            <h4 className="font-medium text-sm text-muted-foreground mb-2">留意事項（本人の役割を含む）</h4>
+            <EditableField 
+              value={goal.userRole}
+              onChange={(value) => onChange('userRole', value)}
+              placeholder="本人の役割や留意事項を入力してください..."
+            />
           </div>
         </div>
       </CardContent>
