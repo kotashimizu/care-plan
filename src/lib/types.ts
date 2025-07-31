@@ -11,11 +11,13 @@ export interface FacilitySettings {
 }
 
 export interface SupportGoal {
+  itemName: string;
   objective: string;
-  userRole: string;
   supportContent: string;
-  frequency: string;
-  evaluation: string;
+  achievementPeriod: string;
+  provider: string;
+  userRole: string;
+  priority: string;
 }
 
 export interface IndividualSupportPlan {
@@ -43,18 +45,7 @@ export interface QualityScore {
 export interface GeneratePlanRequest {
   interviewRecord: string;
   facilitySettings: FacilitySettings;
-  requestType: 'standard' | 'quality-check' | 'alternatives';
-}
-
-export interface GeneratePlanResponse {
-  plan: IndividualSupportPlan;
-  qualityCheck?: QualityCheckResult;
-}
-
-export interface QualityCheckResult {
-  score: QualityScore;
-  improvements: string[];
-  suggestions: string[];
+  requestType: 'standard';
 }
 
 export interface PromptTemplate {
