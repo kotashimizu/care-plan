@@ -10,7 +10,9 @@
       "Bash(claude mcp:*)",
       "Bash(vercel:*)",
       "WebFetch(domain:github.com)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(gh pr create:*)",
+      "Bash(npx tsc:*)"
     ],
     "deny": []
   }

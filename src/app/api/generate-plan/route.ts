@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { GeneratePlanRequest, GeneratePlanResponse } from '@/lib/types'
+import { GeneratePlanRequest } from '@/lib/types'
 import { generateSystemPrompt, generateUserPrompt } from '@/lib/prompts'
 
 // export const runtime = 'edge' // Switched to Node.js runtime for stability
@@ -140,11 +140,7 @@ export async function POST(request: NextRequest) {
       const plan = JSON.parse(cleanContent)
       console.log('API: Successfully parsed JSON')
       
-      const result: GeneratePlanResponse = {
-        plan: plan
-      }
-
-      return NextResponse.json(result)
+      return NextResponse.json({ plan: plan })
     } catch (parseError) {
       console.error('JSON Parse Error - Full details:', {
         message: parseError instanceof Error ? parseError.message : 'Unknown parse error',

@@ -1,12 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { HomePageState, FacilitySettings, QualityCheckResult } from '@/lib/types'
+import { HomePageState, FacilitySettings } from '@/lib/types'
 import { validateInterviewRecord, ValidationResult } from '@/lib/validation'
 import FacilitySettingsPanel from '@/components/FacilitySettingsPanel'
 import InterviewRecordInput from '@/components/InterviewRecordInput'
 import SupportPlanDisplay from '@/components/SupportPlanDisplay'
-import QualityCheck from '@/components/QualityCheck'
 import ValidationWarnings from '@/components/ValidationWarnings'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { AlertCircle, Info } from 'lucide-react'
@@ -32,8 +31,6 @@ export default function HomePage() {
     error: null
   })
 
-  const [qualityResult, setQualityResult] = useState<QualityCheckResult | null>(null)
-  const [isQualityChecking, setIsQualityChecking] = useState(false)
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null)
 
   const handleFacilitySettingsChange = (settings: FacilitySettings) => {
@@ -60,7 +57,6 @@ export default function HomePage() {
 
   const generatePlan = async () => {
     setState(prev => ({ ...prev, isGenerating: true, error: null }))
-    setQualityResult(null)
 
     try {
       const response = await fetch('/api/generate-plan', {
@@ -92,38 +88,6 @@ export default function HomePage() {
         error: error instanceof Error ? error.message : '予期しないエラーが発生しました',
         isGenerating: false
       }))
-    }
-  }
-
-  const runQualityCheck = async () => {
-    if (!state.generatedPlan) return
-
-    setIsQualityChecking(true)
-    try {
-      const response = await fetch('/api/quality-check', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          plan: state.generatedPlan
-        }),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'エラーが発生しました')
-      }
-
-      const data = await response.json()
-      setQualityResult(data)
-    } catch (error) {
-      setState(prev => ({
-        ...prev,
-        error: error instanceof Error ? error.message : '品質チェックでエラーが発生しました'
-      }))
-    } finally {
-      setIsQualityChecking(false)
     }
   }
 
@@ -201,17 +165,6 @@ export default function HomePage() {
         <SupportPlanDisplay plan={state.generatedPlan} />
       )}
 
-      {/* 品質チェックと代替案（計画書が生成された後に表示） */}
-      {state.generatedPlan && (
-        <div className="grid lg:grid-cols-2 gap-8">
-          <QualityCheck
-            qualityResult={qualityResult}
-            isLoading={isQualityChecking}
-            onRunQualityCheck={runQualityCheck}
-          />
-
-        </div>
-      )}
 
       {/* セキュリティ注意事項 */}
       <Card className="bg-gray-50 border-gray-200">

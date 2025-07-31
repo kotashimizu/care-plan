@@ -45,18 +45,7 @@ export interface QualityScore {
 export interface GeneratePlanRequest {
   interviewRecord: string;
   facilitySettings: FacilitySettings;
-  requestType: 'standard' | 'quality-check' | 'alternatives';
-}
-
-export interface GeneratePlanResponse {
-  plan: IndividualSupportPlan;
-  qualityCheck?: QualityCheckResult;
-}
-
-export interface QualityCheckResult {
-  score: QualityScore;
-  improvements: string[];
-  suggestions: string[];
+  requestType: 'standard';
 }
 
 export interface PromptTemplate {
