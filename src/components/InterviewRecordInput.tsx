@@ -39,7 +39,7 @@ export default function InterviewRecordInput({
           <Textarea
             placeholder={`例:
 【基本情報】
-・氏名: 田中太郎さん（25歳、知的障害）
+・年齢: 25歳、知的障害
 ・家族構成: 両親と3人暮らし
 
 【本人の希望・意向】
