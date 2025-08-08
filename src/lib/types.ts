@@ -10,6 +10,18 @@ export interface FacilitySettings {
   };
 }
 
+// 新しい事業区分とプラン詳細度の型定義
+export type ServiceType = 'employment-a' | 'employment-b' | 'daily-care';
+export type PlanDetailLevel = 'basic' | 'detailed';
+
+// 支援計画案のオプション
+export interface SupportPlanOption {
+  id: string;
+  title: string;
+  content: string;
+  category: 'A' | 'B' | 'C';
+}
+
 export interface SupportGoal {
   itemName: string;
   objective: string;
@@ -61,6 +73,14 @@ export interface HomePageState {
   generatedPlan: IndividualSupportPlan | null;
   isGenerating: boolean;
   error: string | null;
+  // 新しいワークフロー用の状態
+  serviceType: ServiceType | null;
+  planDetailLevel: PlanDetailLevel | null;
+  supportPlanOptions: SupportPlanOption[];
+  selectedOptions: string[];
+  currentStep: 'service-selection' | 'data-input' | 'detail-level' | 'plan-generation' | 'plan-selection';
+  userAndFamilyIntentions: string | null;
+  comprehensiveSupport: string | null;
 }
 
 export interface InterviewRecordInputProps {
