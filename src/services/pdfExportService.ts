@@ -181,7 +181,6 @@ export async function generatePDFFromTable(
   doc.setFontSize(14)
   doc.text('表データ', marginMm, marginMm)
 
-  // @ts-expect-error: autotable の型定義差異を吸収
   autoTable(doc, {
     startY: marginMm + 6,
     head: [headers],

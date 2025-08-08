@@ -122,14 +122,14 @@ export default function HomePage() {
     }))
   }
 
-  const handleEditOption = (optionId: string, newContent: string) => {
-    setState(prev => ({
-      ...prev,
-      supportPlanOptions: prev.supportPlanOptions.map(option =>
-        option.id === optionId ? { ...option, content: newContent } : option
-      )
-    }))
-  }
+  // const handleEditOption = (optionId: string, newContent: string) => {
+  //   setState(prev => ({
+  //     ...prev,
+  //     supportPlanOptions: prev.supportPlanOptions.map(option =>
+  //       option.id === optionId ? { ...option, content: newContent } : option
+  //     )
+  //   }))
+  // }
 
   const handleBackToSelection = () => {
     setState(prev => ({
@@ -265,7 +265,7 @@ export default function HomePage() {
             serviceType={state.serviceType!}
             interviewRecord={state.interviewRecord}
             onBack={handleBackToSelection}
-            onEdit={handleEditOption}
+            // onEdit={handleEditOption}
             userAndFamilyIntentions={state.userAndFamilyIntentions || undefined}
             comprehensiveSupport={state.comprehensiveSupport || undefined}
           />
