@@ -27,7 +27,7 @@ export async function addJapaneseFontSupport(doc: jsPDF): Promise<boolean> {
 }
 
 // フォント埋め込み済みかチェック（簡易版）
-export function hasJapaneseFontSupport(_doc: jsPDF): boolean {
+export function hasJapaneseFontSupport(): boolean {
   // 現在は基本的なhelveticaフォントを使用
   // 将来的にカスタムフォントを埋め込む場合はここで判定
   return false

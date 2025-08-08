@@ -128,6 +128,7 @@ export default function PDFPreviewModal({
         URL.revokeObjectURL(previewUrl)
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, pdfData])
 
   const handleZoomIn = () => setZoom(prev => Math.min(prev + 25, 200))

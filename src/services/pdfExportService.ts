@@ -5,7 +5,6 @@
 
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
-// @ts-ignore: 型定義がデフォルトエクスポートに対応していない場合があるため抑制
 import autoTable from 'jspdf-autotable'
 
 export type PDFOrientation = 'portrait' | 'landscape'
@@ -182,7 +181,7 @@ export async function generatePDFFromTable(
   doc.setFontSize(14)
   doc.text('表データ', marginMm, marginMm)
 
-  // @ts-ignore: autotable の型定義差異を吸収
+  // @ts-expect-error: autotable の型定義差異を吸収
   autoTable(doc, {
     startY: marginMm + 6,
     head: [headers],

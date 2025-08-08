@@ -191,9 +191,10 @@ function generateOptionsSystemPrompt(serviceType: ServiceType, planDetailLevel: 
     'daily-care': '生活介護'
   }
 
-  const detailLevelDescription = planDetailLevel === 'detailed' 
-    ? '具体的で詳細な支援内容（記録、評価、具体的手順を含む）'
-    : '基本的で実行しやすい支援内容（緩やかなアプローチ）'
+  // 詳細レベルに応じた説明（現在はプロンプト内で直接使用）
+  // const detailLevelDescription = planDetailLevel === 'detailed' 
+  //   ? '具体的で詳細な支援内容（記録、評価、具体的手順を含む）'
+  //   : '基本的で実行しやすい支援内容（緩やかなアプローチ）'
 
   return `あなたは${serviceTypeNames[serviceType]}の経験豊富なサービス管理責任者です。
 厚生労働省の個別支援計画書作成指針に基づき、利用者の強みと課題を分析し、実効性の高い支援計画を策定してください。

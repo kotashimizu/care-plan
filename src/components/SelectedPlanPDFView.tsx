@@ -5,14 +5,14 @@ import { SupportPlanOption, ServiceType } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 import PDFPreviewModal from './PDFPreviewModal'
-import PlanEditorForm, { UserInfo } from './PlanEditorForm'
+import PlanEditorForm from './PlanEditorForm'
 
 interface SelectedPlanPDFViewProps {
   selectedOptions: SupportPlanOption[];
   serviceType: ServiceType;
   interviewRecord: string;
   onBack: () => void;
-  onEdit: (optionId: string, newContent: string) => void;
+  // onEdit?: (optionId: string, newContent: string) => void;
   userAndFamilyIntentions?: string;
   comprehensiveSupport?: string;
 }
@@ -22,12 +22,12 @@ export default function SelectedPlanPDFView({
   serviceType,
   interviewRecord,
   onBack,
-  onEdit,
+  // onEdit,
   userAndFamilyIntentions,
   comprehensiveSupport
 }: SelectedPlanPDFViewProps) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
-  const [isPDFMode, setIsPDFMode] = useState(false)
+  // const [isPDFMode, setIsPDFMode] = useState(false) // 現在未使用
   const contentRef = useRef<HTMLDivElement>(null)
   const [structuredPlanState, setStructuredPlanState] = useState<{
     userAndFamilyIntentions: string;
@@ -75,11 +75,11 @@ export default function SelectedPlanPDFView({
     C: selectedOptions.filter(opt => opt.category === 'C')
   }
 
-  const categoryTitles = {
-    A: '就労・作業に関する支援',
-    B: '日常生活・健康に関する支援',
-    C: '社会参加・人間関係に関する支援'
-  }
+  // const categoryTitles = {
+  //   A: '就労・作業に関する支援',
+  //   B: '日常生活・健康に関する支援',
+  //   C: '社会参加・人間関係に関する支援'
+  // }
 
   // 厚生労働省準拠の形式でデータを構造化
   const generateStructuredPlan = () => {
@@ -89,11 +89,11 @@ export default function SelectedPlanPDFView({
     const socialOptions = categorizedOptions.C || []
 
     // AIを活用して意向を生成するための準備
-    const generateIntentionsPrompt = () => {
-      // この関数は実際にはAI APIを呼び出すべきですが、
-      // 現在は簡易的な実装として、より自然な文章を生成します
-      return '面談記録と選択された支援内容を基に、利用者とご家族の意向を適切に要約してください。'
-    }
+    // const generateIntentionsPrompt = () => {
+    //   // この関数は実際にはAI APIを呼び出すべきですが、
+    //   // 現在は簡易的な実装として、より自然な文章を生成します
+    //   return '面談記録と選択された支援内容を基に、利用者とご家族の意向を適切に要約してください。'
+    // }
     
     // 面談記録から意向を生成（AIから取得した内容を優先）
     const extractIntentions = (record: string) => {
@@ -621,7 +621,7 @@ export default function SelectedPlanPDFView({
         onClose={() => setIsPreviewOpen(false)}
         contentRef={contentRef}
         fileName="個別支援計画書"
-        onOpenChange={(isOpen) => setIsPDFMode(isOpen)}
+        onOpenChange={() => {}}
         pdfData={{
           serviceType: getServiceTypeName(serviceType),
           userAndFamilyIntentions: structuredPlan.userAndFamilyIntentions,
