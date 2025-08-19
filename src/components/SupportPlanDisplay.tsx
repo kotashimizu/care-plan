@@ -73,30 +73,27 @@ ${currentPlan.shortTermGoal}
 ■ 支援目標
 
 【就労に関する支援】
-項目: ${currentPlan.supportGoals.employment.itemName}
-支援目標: ${currentPlan.supportGoals.employment.objective}
+到達目標: ${currentPlan.supportGoals.employment.objective}
+本人の役割: ${currentPlan.supportGoals.employment.userRole}
 支援内容: ${currentPlan.supportGoals.employment.supportContent}
-達成時期: ${currentPlan.supportGoals.employment.achievementPeriod}
+支援期間: ${currentPlan.supportGoals.employment.supportPeriod}
 担当者: ${currentPlan.supportGoals.employment.provider}
-留意事項: ${currentPlan.supportGoals.employment.userRole}
 優先順位: ${currentPlan.supportGoals.employment.priority}
 
 【日常生活に関する支援】
-項目: ${currentPlan.supportGoals.dailyLife.itemName}
-支援目標: ${currentPlan.supportGoals.dailyLife.objective}
+到達目標: ${currentPlan.supportGoals.dailyLife.objective}
+本人の役割: ${currentPlan.supportGoals.dailyLife.userRole}
 支援内容: ${currentPlan.supportGoals.dailyLife.supportContent}
-達成時期: ${currentPlan.supportGoals.dailyLife.achievementPeriod}
+支援期間: ${currentPlan.supportGoals.dailyLife.supportPeriod}
 担当者: ${currentPlan.supportGoals.dailyLife.provider}
-留意事項: ${currentPlan.supportGoals.dailyLife.userRole}
 優先順位: ${currentPlan.supportGoals.dailyLife.priority}
 
 【社会生活に関する支援】
-項目: ${currentPlan.supportGoals.socialLife.itemName}
-支援目標: ${currentPlan.supportGoals.socialLife.objective}
+到達目標: ${currentPlan.supportGoals.socialLife.objective}
+本人の役割: ${currentPlan.supportGoals.socialLife.userRole}
 支援内容: ${currentPlan.supportGoals.socialLife.supportContent}
-達成時期: ${currentPlan.supportGoals.socialLife.achievementPeriod}
+支援期間: ${currentPlan.supportGoals.socialLife.supportPeriod}
 担当者: ${currentPlan.supportGoals.socialLife.provider}
-留意事項: ${currentPlan.supportGoals.socialLife.userRole}
 優先順位: ${currentPlan.supportGoals.socialLife.priority}
     `.trim()
     
@@ -151,12 +148,11 @@ ${currentPlan.shortTermGoal}
   }: { 
     title: string
     goal: {
-      itemName: string
       objective: string
-      supportContent: string
-      achievementPeriod: string
-      provider: string
       userRole: string
+      supportContent: string
+      supportPeriod: string
+      provider: string
       priority: string
     }
     icon: React.ComponentType<{ className?: string }>
@@ -173,12 +169,11 @@ ${currentPlan.shortTermGoal}
             variant="ghost"
             size="sm"
             onClick={() => copyToClipboard(`
-項目: ${goal.itemName}
-支援目標: ${goal.objective}
+到達目標: ${goal.objective}
+本人の役割: ${goal.userRole}
 支援内容: ${goal.supportContent}
-達成時期: ${goal.achievementPeriod}
+支援期間: ${goal.supportPeriod}
 担当者: ${goal.provider}
-留意事項: ${goal.userRole}
 優先順位: ${goal.priority}
             `.trim(), sectionKey)}
             className="h-8 w-8 p-0"
@@ -194,30 +189,26 @@ ${currentPlan.shortTermGoal}
       <CardContent>
         <div className="space-y-3">
           <div>
-            <h4 className="font-medium text-sm text-muted-foreground mb-1">項目</h4>
-            <p className="text-sm font-medium">{goal.itemName}</p>
-          </div>
-          <div>
-            <h4 className="font-medium text-sm text-muted-foreground mb-1">支援目標</h4>
+            <h4 className="font-medium text-sm text-muted-foreground mb-1">到達目標（ご本人の希望）</h4>
             <p className="text-sm">{goal.objective}</p>
           </div>
           <div>
-            <h4 className="font-medium text-sm text-muted-foreground mb-1">支援内容</h4>
+            <h4 className="font-medium text-sm text-muted-foreground mb-1">ご本人の役割</h4>
+            <p className="text-sm">{goal.userRole}</p>
+          </div>
+          <div>
+            <h4 className="font-medium text-sm text-muted-foreground mb-1">支援内容（留意事項含む）</h4>
             <p className="text-sm">{goal.supportContent}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-1">達成時期</h4>
-              <p className="text-sm">{goal.achievementPeriod}</p>
+              <h4 className="font-medium text-sm text-muted-foreground mb-1">支援期間</h4>
+              <p className="text-sm">{goal.supportPeriod}</p>
             </div>
             <div>
               <h4 className="font-medium text-sm text-muted-foreground mb-1">担当者</h4>
               <p className="text-sm">{goal.provider}</p>
             </div>
-          </div>
-          <div>
-            <h4 className="font-medium text-sm text-muted-foreground mb-1">留意事項（本人の役割を含む）</h4>
-            <p className="text-sm">{goal.userRole}</p>
           </div>
           <div>
             <h4 className="font-medium text-sm text-muted-foreground mb-1">優先順位</h4>

@@ -129,36 +129,36 @@ export default function EditableSupportPlan({ plan, onSave, onCancel }: Editable
       <CardContent>
         <div className="space-y-4">
           <div>
-            <h4 className="font-medium text-sm text-muted-foreground mb-2">項目</h4>
-            <EditableField 
-              value={goal.itemName}
-              onChange={(value) => onChange('itemName', value)}
-              placeholder="支援項目名を入力してください..."
-            />
-          </div>
-          <div>
-            <h4 className="font-medium text-sm text-muted-foreground mb-2">支援目標</h4>
+            <h4 className="font-medium text-sm text-muted-foreground mb-2">到達目標（ご本人の希望）</h4>
             <EditableField 
               value={goal.objective}
               onChange={(value) => onChange('objective', value)}
-              placeholder="具体的な目標を入力してください..."
+              placeholder="ご本人の希望を「〜したい」形式で入力してください..."
             />
           </div>
           <div>
-            <h4 className="font-medium text-sm text-muted-foreground mb-2">支援内容</h4>
+            <h4 className="font-medium text-sm text-muted-foreground mb-2">ご本人の役割</h4>
+            <EditableField 
+              value={goal.userRole}
+              onChange={(value) => onChange('userRole', value)}
+              placeholder="ご本人が取り組む内容を「〜します」形式で入力してください..."
+            />
+          </div>
+          <div>
+            <h4 className="font-medium text-sm text-muted-foreground mb-2">支援内容（留意事項含む）</h4>
             <EditableField 
               value={goal.supportContent}
               onChange={(value) => onChange('supportContent', value)}
-              placeholder="支援内容・提供上のポイントを入力してください..."
+              placeholder="支援者が行う支援を「〜を支援します」形式で入力してください..."
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-2">達成時期</h4>
+              <h4 className="font-medium text-sm text-muted-foreground mb-2">支援期間</h4>
               <EditableField 
-                value={goal.achievementPeriod}
-                onChange={(value) => onChange('achievementPeriod', value)}
-                placeholder="目標達成の具体的時期を入力してください..."
+                value={goal.supportPeriod}
+                onChange={(value) => onChange('supportPeriod', value)}
+                placeholder="頻度・時間・期間を入力（例：月〜金 10:00〜15:00）..."
               />
             </div>
             <div>
@@ -171,19 +171,11 @@ export default function EditableSupportPlan({ plan, onSave, onCancel }: Editable
             </div>
           </div>
           <div>
-            <h4 className="font-medium text-sm text-muted-foreground mb-2">留意事項（本人の役割を含む）</h4>
-            <EditableField 
-              value={goal.userRole}
-              onChange={(value) => onChange('userRole', value)}
-              placeholder="本人の役割や留意事項を入力してください..."
-            />
-          </div>
-          <div>
             <h4 className="font-medium text-sm text-muted-foreground mb-2">優先順位</h4>
             <EditableField 
               value={goal.priority}
               onChange={(value) => onChange('priority', value)}
-              placeholder="優先順位（高・中・低）と理由を入力してください..."
+              placeholder="優先順位を1, 2, 3で入力してください..."
             />
           </div>
         </div>

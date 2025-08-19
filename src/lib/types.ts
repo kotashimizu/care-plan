@@ -23,13 +23,12 @@ export interface SupportPlanOption {
 }
 
 export interface SupportGoal {
-  itemName: string;
-  objective: string;
-  supportContent: string;
-  achievementPeriod: string;
-  provider: string;
-  userRole: string;
-  priority: string;
+  objective: string;      // 到達目標（本人の希望）
+  userRole: string;       // 本人の役割
+  supportContent: string; // 支援内容（留意事項含む）
+  supportPeriod: string;  // 支援期間（頻度・時間・期間）
+  provider: string;       // 担当者
+  priority: string;       // 優先順位（1,2,3）
 }
 
 export interface IndividualSupportPlan {
