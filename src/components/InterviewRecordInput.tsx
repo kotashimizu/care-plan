@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { FileText, Loader2 } from 'lucide-react'
+import { HelpTooltip } from '@/components/ui/help-tooltip'
 
 export default function InterviewRecordInput({ 
   value, 
@@ -28,13 +29,18 @@ export default function InterviewRecordInput({
           面談記録入力
         </CardTitle>
         <CardDescription>
-          利用者との面談内容を入力してください。具体的な発言や観察内容を含めることで、より精度の高い個別支援計画書が生成されます。
+          ご利用者様との面談内容を入力してください。ご本人の言葉をそのまま記載することで、より適切な支援計画を作成できます。
         </CardDescription>
+        <HelpTooltip 
+          content="ご本人の希望や気持ちを「〜したい」という形で記載すると、より良い計画書が作成されます" 
+          className="mt-2"
+        />
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
           <label className="text-sm font-medium mb-2 block">
             面談記録内容
+            <span className="text-xs text-gray-500 ml-2">（ご本人の言葉をできるだけそのまま記載してください）</span>
           </label>
           <Textarea
             placeholder={`例:
