@@ -50,7 +50,6 @@ export default function PDFPreviewModal({
     setError(null)
 
     try {
-      console.log('PDFプレビュー生成を開始...')
       // 優先: DOMプレビュー（html2canvas + jsPDF）
       if (contentRef?.current) {
         const pdfBlob = await exportService.previewElementAsPDF(contentRef.current, {
@@ -62,7 +61,6 @@ export default function PDFPreviewModal({
         })
         const url = URL.createObjectURL(pdfBlob)
         setPreviewUrl(url)
-        console.log('PDFプレビュー生成完了（DOMキャプチャ）')
       } else {
         // フォールバック: 直接jsPDF生成（既存クラス）
         const { GovernmentStylePDFGenerator } = await import('@/lib/pdf-generator')
@@ -70,10 +68,8 @@ export default function PDFPreviewModal({
         const pdfBlob = await generator.generatePreviewBlob(pdfData)
         const url = URL.createObjectURL(pdfBlob)
         setPreviewUrl(url)
-        console.log('PDFプレビュー生成完了（フォールバック）')
       }
-    } catch (error) {
-      console.error('PDF生成エラー:', error)
+    } catch {
       setError('PDFの生成に失敗しました。もう一度お試しください。')
     } finally {
       setIsGenerating(false)
@@ -85,7 +81,6 @@ export default function PDFPreviewModal({
 
     setIsGenerating(true)
     try {
-      console.log('PDF出力を開始...')
       if (contentRef?.current) {
         await exportService.saveElementAsPDF(contentRef.current, {
           fileName,
@@ -95,15 +90,12 @@ export default function PDFPreviewModal({
           fitToOnePage: true,
           orientation: 'landscape'
         })
-        console.log('PDF出力完了（DOMキャプチャ）')
       } else {
         const { GovernmentStylePDFGenerator } = await import('@/lib/pdf-generator')
         const generator = new GovernmentStylePDFGenerator()
         await generator.downloadPDF(pdfData, fileName)
-        console.log('PDF出力完了（フォールバック）')
       }
-    } catch (error) {
-      console.error('PDF出力エラー:', error)
+    } catch {
       setError('PDFの出力に失敗しました。')
     } finally {
       setIsGenerating(false)

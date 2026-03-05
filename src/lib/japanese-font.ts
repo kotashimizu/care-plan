@@ -3,25 +3,13 @@ import jsPDF from 'jspdf'
 
 export async function addJapaneseFontSupport(doc: jsPDF): Promise<boolean> {
   try {
-    console.log('日本語フォントの埋め込みを試行中...')
-    
-    // jsPDFの日本語対応は複雑なため、まずシンプルな方法を試行
-    // フォント埋め込みではなく、文字エンコーディングの設定を試す
-    
     try {
-      // 日本語対応のための設定
       doc.setFont('helvetica', 'normal')
-      
-      console.log('基本的な日本語対応設定を適用しました')
       return true
-      
-    } catch (fontError) {
-      console.warn('フォント設定に失敗:', fontError)
+    } catch {
       return false
     }
-    
-  } catch (error) {
-    console.error('日本語フォント設定エラー:', error)
+  } catch {
     return false
   }
 }

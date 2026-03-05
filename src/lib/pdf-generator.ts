@@ -49,21 +49,17 @@ export class GovernmentStylePDFGenerator {
     if (this.fontReady) return
 
     try {
-      console.log('PDF生成: フォント設定を開始')
       const success = await addJapaneseFontSupport(this.doc)
-      
+
       if (success) {
         this.fontReady = true
-        console.log('PDF生成: フォント設定完了')
       } else {
-        console.warn('PDF生成: 標準フォントを使用します')
         this.doc.setFont('helvetica', 'normal')
-        this.fontReady = true // 標準フォントでも準備完了とする
+        this.fontReady = true
       }
-    } catch (error) {
-      console.error('PDF生成: フォント設定エラー:', error)
+    } catch {
       this.doc.setFont('helvetica', 'normal')
-      this.fontReady = true // エラー時も準備完了とする
+      this.fontReady = true
     }
   }
 
@@ -90,8 +86,7 @@ export class GovernmentStylePDFGenerator {
           }
         })
         return lines.length * (fontSize * 0.35)
-      } catch (error) {
-        console.warn('テキスト分割エラー:', error)
+      } catch {
         // フォールバック: 分割せずに表示
         this.doc.text(processedText, x, y, { align })
         return fontSize * 0.35
@@ -100,8 +95,7 @@ export class GovernmentStylePDFGenerator {
       try {
         this.doc.text(processedText, x, y, { align })
         return fontSize * 0.35
-      } catch (error) {
-        console.warn('テキスト表示エラー:', error)
+      } catch {
         // フォールバック: エラー時は何も表示しない
         return fontSize * 0.35
       }
@@ -121,9 +115,7 @@ export class GovernmentStylePDFGenerator {
     
     // 日本語文字が含まれている場合はラテン文字に変換
     if (containsJapanese(processedText)) {
-      const latinText = convertToLatinEquivalent(processedText)
-      console.log(`日本語文字を変換: "${processedText}" -> "${latinText}"`)
-      return latinText
+      return convertToLatinEquivalent(processedText)
     }
     
     return processedText

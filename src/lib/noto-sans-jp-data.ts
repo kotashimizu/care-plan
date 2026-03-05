@@ -51,8 +51,6 @@ export async function loadJapaneseFontFromCDN(): Promise<string | null> {
       fontUrl = firstMatch[1].replace(/['"]/g, '');
     }
     
-    console.log('フォントURL:', fontUrl);
-    
     // フォントファイルを取得
     const fontResponse = await fetch(fontUrl);
     if (!fontResponse.ok) {
@@ -72,11 +70,9 @@ export async function loadJapaneseFontFromCDN(): Promise<string | null> {
     }
     
     const base64Font = btoa(binaryString);
-    console.log(`フォントBase64エンコード完了: ${base64Font.length}文字`);
     return base64Font;
     
-  } catch (error) {
-    console.error('日本語フォントの読み込みに失敗:', error);
+  } catch {
     return null;
   }
 }

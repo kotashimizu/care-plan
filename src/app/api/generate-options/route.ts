@@ -1,186 +1,72 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ServiceType, PlanDetailLevel } from '@/lib/types'
+import { generateJsonContent } from '@/lib/ai-client'
+
+const MAX_INPUT_LENGTH = 10000
 
 interface GenerateOptionsRequest {
-  interviewRecord: string;
-  serviceType: ServiceType;
-  planDetailLevel: PlanDetailLevel;
+  interviewRecord: string
+  serviceType: ServiceType
+  planDetailLevel: PlanDetailLevel
 }
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('API: generate-options called')
-    
     let body: GenerateOptionsRequest
     try {
       body = await request.json()
-      console.log('API: Request body received:', JSON.stringify(body, null, 2))
-    } catch (bodyParseError) {
-      console.error('API: Request body parse error:', bodyParseError)
+    } catch {
       return NextResponse.json(
         { error: 'リクエストボディの形式が正しくありません' },
         { status: 400 }
       )
     }
-    
+
     const { interviewRecord, serviceType, planDetailLevel } = body
 
     if (!interviewRecord || !serviceType || !planDetailLevel) {
-      console.log('API: Missing required fields')
       return NextResponse.json(
         { error: '必要な項目が不足しています' },
         { status: 400 }
       )
     }
 
-    const apiKey = process.env.OPENAI_API_KEY
-    
-    if (!apiKey) {
-      console.error('API: Missing OpenAI API key')
-      console.error('Environment variables:', Object.keys(process.env).filter(key => key.includes('OPENAI')))
+    if (interviewRecord.length > MAX_INPUT_LENGTH) {
       return NextResponse.json(
-        { error: 'OpenAI API キーが設定されていません。.env.localファイルを確認してください。' },
-        { status: 500 }
+        { error: `面談記録は${MAX_INPUT_LENGTH}文字以内で入力してください` },
+        { status: 400 }
       )
     }
-    
-    console.log('API: API key found, length:', apiKey.length)
 
     const systemPrompt = generateOptionsSystemPrompt(serviceType, planDetailLevel)
     const userPrompt = generateOptionsUserPrompt(interviewRecord)
 
-    console.log('API: System prompt length:', systemPrompt.length)
-    console.log('API: User prompt length:', userPrompt.length)
-    console.log('API: Calling OpenAI API for options generation...')
-    
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 45000)
-    
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      signal: controller.signal,
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: systemPrompt
-          },
-          {
-            role: 'user',
-            content: userPrompt
-          }
-        ],
-        temperature: 0.8,
-        max_tokens: 3000,
-        response_format: { type: 'json_object' }
-      }),
+    const options = await generateJsonContent<{
+      userAndFamilyIntentions?: string
+      comprehensiveSupport?: string
+      supportPlanOptions?: Array<{ id: string; category: string; title: string; content: string }>
+    }>({
+      systemInstruction: systemPrompt,
+      messages: [{ role: 'user', parts: [{ text: userPrompt }] }],
+      temperature: 0.8,
+      maxOutputTokens: 3000,
     })
-    
-    clearTimeout(timeoutId)
-    
-    console.log('API: OpenAI response status:', response.status)
 
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('OpenAI API Error:', {
-        status: response.status,
-        statusText: response.statusText,
-        error: errorText
-      })
-      
-      // OpenAI APIの具体的なエラーメッセージを含める
-      let errorMessage = 'AI APIでエラーが発生しました'
-      try {
-        const errorData = JSON.parse(errorText)
-        if (errorData.error?.message) {
-          errorMessage = `AI API Error: ${errorData.error.message}`
-        }
-      } catch {
-        // JSONパースエラーは無視
-      }
-      
-      return NextResponse.json(
-        { error: errorMessage },
-        { status: 500 }
-      )
-    }
-
-    const data = await response.json()
-    const content = data.choices[0]?.message?.content
-
-    if (!content) {
-      return NextResponse.json(
-        { error: 'AIからの応答が取得できませんでした' },
-        { status: 500 }
-      )
-    }
-
-    try {
-      console.log('API: Parsing AI response...')
-      
-      let cleanContent = content.trim()
-      const jsonStartIndex = cleanContent.indexOf('{')
-      const jsonEndIndex = cleanContent.lastIndexOf('}')
-      
-      if (jsonStartIndex !== -1 && jsonEndIndex !== -1) {
-        cleanContent = cleanContent.substring(jsonStartIndex, jsonEndIndex + 1)
-      }
-      
-      const options = JSON.parse(cleanContent)
-      console.log('API: Successfully parsed options JSON')
-      console.log('API: Full parsed options:', JSON.stringify(options, null, 2))
-      console.log('API: Parsed data structure:', {
-        hasUserIntentions: !!options.userAndFamilyIntentions,
-        userIntentionsValue: options.userAndFamilyIntentions,
-        hasComprehensive: !!options.comprehensiveSupport,
-        comprehensiveValue: options.comprehensiveSupport,
-        optionsCount: options.supportPlanOptions?.length || 0
-      })
-      
-      // 意向と支援方針も含めて返す
-      const responseData = { 
-        options: options.supportPlanOptions || [],
-        userAndFamilyIntentions: options.userAndFamilyIntentions || null,
-        comprehensiveSupport: options.comprehensiveSupport || null
-      }
-      console.log('API: Sending response:', JSON.stringify(responseData, null, 2))
-      return NextResponse.json(responseData)
-    } catch (parseError) {
-      console.error('JSON Parse Error:', parseError)
-      return NextResponse.json(
-        { error: 'AIの応答形式が正しくありません' },
-        { status: 500 }
-      )
-    }
-
+    return NextResponse.json({
+      options: options.supportPlanOptions || [],
+      userAndFamilyIntentions: options.userAndFamilyIntentions || null,
+      comprehensiveSupport: options.comprehensiveSupport || null,
+    })
   } catch (error) {
-    console.error('API Error:', error)
-    console.error('Error details:', {
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-      type: typeof error
-    })
-    
     if (error instanceof Error && error.name === 'AbortError') {
       return NextResponse.json(
         { error: 'リクエストがタイムアウトしました' },
         { status: 504 }
       )
     }
-    
-    const errorMessage = error instanceof Error 
-      ? `内部サーバーエラー: ${error.message}` 
-      : '内部サーバーエラーが発生しました'
-    
-    return NextResponse.json(
-      { error: errorMessage },
-      { status: 500 }
-    )
+
+    const message = error instanceof Error ? error.message : '内部サーバーエラーが発生しました'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
 
@@ -188,13 +74,8 @@ function generateOptionsSystemPrompt(serviceType: ServiceType, planDetailLevel: 
   const serviceTypeNames = {
     'employment-a': '就労継続支援A型',
     'employment-b': '就労継続支援B型',
-    'daily-care': '生活介護'
+    'daily-care': '生活介護',
   }
-
-  // 詳細レベルに応じた説明（現在はプロンプト内で直接使用）
-  // const detailLevelDescription = planDetailLevel === 'detailed' 
-  //   ? '具体的で詳細な支援内容（記録、評価、具体的手順を含む）'
-  //   : '基本的で実行しやすい支援内容（緩やかなアプローチ）'
 
   return `あなたは${serviceTypeNames[serviceType]}の経験豊富なサービス管理責任者です。
 厚生労働省の個別支援計画書作成指針に基づき、利用者の強みと課題を分析し、実効性の高い支援計画を策定してください。
@@ -225,7 +106,7 @@ function generateOptionsSystemPrompt(serviceType: ServiceType, planDetailLevel: 
 - 作業スキル向上、職場適応、就労準備性の向上
 - 具体例：作業手順の習得、集中力向上訓練、職場マナー指導
 
-### B項目：生活支援  
+### B項目：生活支援
 - ADL/IADL向上、健康管理、生活リズム確立
 - 具体例：服薬管理、金銭管理、身だしなみ指導
 
@@ -233,12 +114,12 @@ function generateOptionsSystemPrompt(serviceType: ServiceType, planDetailLevel: 
 - 対人スキル向上、社会資源活用、余暇活動
 - 具体例：SST実施、地域行事参加、ピアサポート
 
-${planDetailLevel === 'detailed' ? 
-`## 詳細プランの要件：
+${planDetailLevel === 'detailed'
+    ? `## 詳細プランの要件：
 - 週間/月間スケジュールを想定した頻度設定
 - 評価指標の明確化（数値目標含む）
-- 段階的なステップアップの設定` :
-`## 基本プランの要件：
+- 段階的なステップアップの設定`
+    : `## 基本プランの要件：
 - スモールステップでの目標設定
 - 利用者の負担に配慮した段階的アプローチ
 - 成功体験を重視した支援内容`}

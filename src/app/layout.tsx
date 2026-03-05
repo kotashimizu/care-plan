@@ -34,7 +34,7 @@ export default function RootLayout({
           <footer className="border-t border-border bg-card mt-16">
             <div className="container mx-auto px-4 py-6">
               <p className="text-center text-sm text-muted-foreground">
-                © 2024 個別支援計画書作成支援システム
+                © 2025 個別支援計画書作成支援システム
               </p>
             </div>
           </footer>
