@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm:*)",
+      "Bash(npm init:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(find:*)",
+      "Bash(claude mcp:*)",
+      "Bash(vercel:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(git add:*)",
+      "Bash(gh pr create:*)",
+      "Bash(npx tsc:*)",
+      "mcp__serena__activate_project",
+      "mcp__serena__onboarding",
+      "mcp__serena__search_for_pattern",
+      "mcp__serena__write_memory",
+      "mcp__serena__get_symbols_overview",
+      "mcp__serena__read_memory",
+      "mcp__serena__list_dir",
+      "mcp__serena__find_symbol",
+      "mcp__serena__replace_symbol_body",
+      "mcp__serena__replace_regex",
+      "Bash(gh pr list:*)",
+      "Bash(git init:*)",
+      "Bash(git rm:*)"
+    ],
+    "deny": []
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "braveSearch",
+    "filesystem",
+    "context7",
+    "supabase",
+    "notion",
+    "serena"
+  ]
+}
