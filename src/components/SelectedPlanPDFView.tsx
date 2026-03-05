@@ -4,7 +4,9 @@ import { useState, useRef } from 'react'
 import { SupportPlanOption, ServiceType } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
-import PDFPreviewModal from './PDFPreviewModal'
+import dynamic from 'next/dynamic'
+
+const PDFPreviewModal = dynamic(() => import('./PDFPreviewModal'), { ssr: false })
 import PlanEditorForm from './PlanEditorForm'
 
 interface SelectedPlanPDFViewProps {

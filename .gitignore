@@ -44,7 +44,9 @@ next-env.d.ts
 Thumbs.db
 
 # Serena cache
-.serena/cache/# Service Account Keys
+.serena/cache/
+
+# Service Account Keys
 *.json
 !package.json
 !package-lock.json

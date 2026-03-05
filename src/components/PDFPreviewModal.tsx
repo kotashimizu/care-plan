@@ -1,9 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
+import { Document, Page, pdfjs } from 'react-pdf'
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css'
+import 'react-pdf/dist/esm/Page/TextLayer.css'
 import { Button } from '@/components/ui/button'
 import { X, Download, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react'
 import { exportService } from '@/services/exportService'
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
 
 interface PDFPreviewModalProps {
   isOpen: boolean;
@@ -38,19 +43,19 @@ export default function PDFPreviewModal({
   onOpenChange,
   pdfData
 }: PDFPreviewModalProps) {
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
-  const [zoom, setZoom] = useState(100)
+  const [scale, setScale] = useState(1.0)
+  const [numPages, setNumPages] = useState(0)
   const [error, setError] = useState<string | null>(null)
 
-  const generatePreview = async () => {
+  const generatePreview = useCallback(async () => {
     if (!isOpen || !pdfData) return
 
     setIsGenerating(true)
     setError(null)
 
     try {
-      // 優先: DOMプレビュー（html2canvas + jsPDF）
       if (contentRef?.current) {
         const pdfBlob = await exportService.previewElementAsPDF(contentRef.current, {
           scale: 3,
@@ -60,21 +65,20 @@ export default function PDFPreviewModal({
           orientation: 'landscape'
         })
         const url = URL.createObjectURL(pdfBlob)
-        setPreviewUrl(url)
+        setPdfBlobUrl(url)
       } else {
-        // フォールバック: 直接jsPDF生成（既存クラス）
         const { GovernmentStylePDFGenerator } = await import('@/lib/pdf-generator')
         const generator = new GovernmentStylePDFGenerator()
         const pdfBlob = await generator.generatePreviewBlob(pdfData)
         const url = URL.createObjectURL(pdfBlob)
-        setPreviewUrl(url)
+        setPdfBlobUrl(url)
       }
     } catch {
       setError('PDFの生成に失敗しました。もう一度お試しください。')
     } finally {
       setIsGenerating(false)
     }
-  }
+  }, [isOpen, pdfData, contentRef])
 
   const downloadPDF = async () => {
     if (!pdfData) return
@@ -108,33 +112,42 @@ export default function PDFPreviewModal({
       generatePreview()
     } else {
       onOpenChange?.(false)
-      // モーダルが閉じられたらURLをクリーンアップ
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl)
-        setPreviewUrl(null)
+      if (pdfBlobUrl) {
+        URL.revokeObjectURL(pdfBlobUrl)
+        setPdfBlobUrl(null)
       }
+      setNumPages(0)
     }
 
     return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl)
+      if (pdfBlobUrl) {
+        URL.revokeObjectURL(pdfBlobUrl)
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, pdfData])
 
-  const handleZoomIn = () => setZoom(prev => Math.min(prev + 25, 200))
-  const handleZoomOut = () => setZoom(prev => Math.max(prev - 25, 50))
-  const handleZoomReset = () => setZoom(100)
+  const handleZoomIn = () => setScale(prev => Math.min(prev + 0.25, 2.5))
+  const handleZoomOut = () => setScale(prev => Math.max(prev - 0.25, 0.5))
+  const handleZoomReset = () => setScale(1.0)
+
+  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
+    setNumPages(numPages)
+  }
 
   if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl h-full max-h-[90vh] flex flex-col">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-5xl h-full max-h-[90vh] flex flex-col">
         {/* ヘッダー */}
         <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-semibold">PDFプレビュー</h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-lg font-semibold">PDFプレビュー</h2>
+            {numPages > 0 && (
+              <span className="text-sm text-gray-500">{numPages}ページ</span>
+            )}
+          </div>
           <div className="flex items-center gap-2">
             {/* ズームコントロール */}
             <div className="flex items-center gap-1 border rounded">
@@ -142,7 +155,7 @@ export default function PDFPreviewModal({
                 <ZoomOut className="h-4 w-4" />
               </Button>
               <span className="px-2 py-1 text-sm border-x min-w-[60px] text-center">
-                {zoom}%
+                {Math.round(scale * 100)}%
               </span>
               <Button size="sm" variant="ghost" onClick={handleZoomIn}>
                 <ZoomIn className="h-4 w-4" />
@@ -151,16 +164,16 @@ export default function PDFPreviewModal({
                 <RotateCcw className="h-4 w-4" />
               </Button>
             </div>
-            
+
             <Button
               onClick={downloadPDF}
-              disabled={isGenerating || !previewUrl}
+              disabled={isGenerating || !pdfBlobUrl}
               size="sm"
             >
               <Download className="h-4 w-4 mr-2" />
               ダウンロード
             </Button>
-            
+
             <Button size="sm" variant="ghost" onClick={onClose}>
               <X className="h-4 w-4" />
             </Button>
@@ -185,29 +198,43 @@ export default function PDFPreviewModal({
                 </Button>
               </div>
             </div>
-          ) : previewUrl ? (
-            <div 
-              className="mx-auto bg-white shadow-lg"
-              style={{ 
-                transform: `scale(${zoom / 100})`,
-                transformOrigin: 'top center',
-                transition: 'transform 0.2s ease'
-              }}
-            >
-              <iframe
-                src={previewUrl}
-                className="w-full h-[800px] border-0"
-                title="PDF Preview"
-              />
+          ) : pdfBlobUrl ? (
+            <div className="flex flex-col items-center gap-4">
+              <Document
+                file={pdfBlobUrl}
+                onLoadSuccess={onDocumentLoadSuccess}
+                onLoadError={() => setError('PDFの読み込みに失敗しました。')}
+                loading={
+                  <div className="flex items-center justify-center py-16">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  </div>
+                }
+              >
+                {Array.from(new Array(numPages), (_, index) => (
+                  <div key={`page_${index + 1}`} className="mb-4 shadow-lg">
+                    <Page
+                      pageNumber={index + 1}
+                      scale={scale}
+                      renderTextLayer={false}
+                      renderAnnotationLayer={false}
+                    />
+                  </div>
+                ))}
+              </Document>
             </div>
           ) : null}
         </div>
 
         {/* フッター */}
-        <div className="p-4 border-t bg-gray-50">
-          <p className="text-xs text-gray-600 text-center">
-            jsPDF直接生成による高品質なPDFプレビューです。ダウンロードしてご確認ください。
+        <div className="p-3 border-t bg-gray-50 flex items-center justify-between">
+          <p className="text-xs text-gray-500">
+            ダウンロードしてご確認ください
           </p>
+          {numPages > 1 && (
+            <p className="text-xs text-gray-500">
+              全{numPages}ページ（スクロールで閲覧）
+            </p>
+          )}
         </div>
       </div>
     </div>
