@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       systemInstruction: systemPrompt,
       messages: [{ role: 'user', parts: [{ text: userPrompt }] }],
       temperature: 0.7,
-      maxOutputTokens: 2200,
+      maxOutputTokens: 8000,
     })
 
     return NextResponse.json({ plan })

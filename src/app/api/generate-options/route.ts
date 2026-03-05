@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       systemInstruction: systemPrompt,
       messages: [{ role: 'user', parts: [{ text: userPrompt }] }],
       temperature: 0.8,
-      maxOutputTokens: 3000,
+      maxOutputTokens: 8000,
     })
 
     return NextResponse.json({

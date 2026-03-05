@@ -44,4 +44,10 @@ next-env.d.ts
 Thumbs.db
 
 # Serena cache
-.serena/cache/
+.serena/cache/# Service Account Keys
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+!vercel.json
+!components.json
